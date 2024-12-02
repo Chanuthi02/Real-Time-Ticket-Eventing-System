@@ -1,97 +1,97 @@
 package org.example;
 
 import com.google.gson.Gson;
-import java.io.*;
-import java.util.Scanner;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Configuration {
-    // Configuration parameters
-    private int totalTickets;
-    private int ticketReleaseRate;
-    private int customerRetrievalRate;
-    private int maxTicketCapacity;
+    private int totalTickets = 100; // Default value
+    private int ticketReleaseRate = 1000; // Default value
+    private int customerRetrievalRate = 1000; // Default value
+    private int maxTicketCapacity = 10; // Default value
 
-    // Constructor
-    public Configuration(int totalTickets, int ticketReleaseRate, int customerRetrievalRate, int maxTicketCapacity) {
-        this.totalTickets = totalTickets;
-        this.ticketReleaseRate = ticketReleaseRate;
-        this.customerRetrievalRate = customerRetrievalRate;
-        this.maxTicketCapacity = maxTicketCapacity;
-    }
-
-    // Getter methods
+    // Getters and setters
     public int getTotalTickets() {
         return totalTickets;
+    }
+
+    public void setTotalTickets(int totalTickets) {
+        this.totalTickets = totalTickets;
     }
 
     public int getTicketReleaseRate() {
         return ticketReleaseRate;
     }
 
+    public void setTicketReleaseRate(int ticketReleaseRate) {
+        this.ticketReleaseRate = ticketReleaseRate;
+    }
+
     public int getCustomerRetrievalRate() {
         return customerRetrievalRate;
+    }
+
+    public void setCustomerRetrievalRate(int customerRetrievalRate) {
+        this.customerRetrievalRate = customerRetrievalRate;
     }
 
     public int getMaxTicketCapacity() {
         return maxTicketCapacity;
     }
 
-    // Load configuration from a file
+    public void setMaxTicketCapacity(int maxTicketCapacity) {
+        this.maxTicketCapacity = maxTicketCapacity;
+    }
+
+    // Load configuration from file
     public static Configuration loadConfiguration() {
-        try {
-            FileReader reader = new FileReader("config.json");
+        try (FileReader reader = new FileReader("config.json")) {
             Gson gson = new Gson();
             return gson.fromJson(reader, Configuration.class);
-        } catch (FileNotFoundException e) {
-            System.out.println("No saved configuration found. Using default values.");
-            return new Configuration(100, 10, 5, 50); // Default values
+        } catch (IOException e) {
+            System.out.println("Error loading configuration: " + e.getMessage());
+            return new Configuration(); // Return default configuration if file does not exist
         }
     }
 
-    // Save configuration to a file
+    // Save configuration to file
     public void saveConfiguration() {
         try (FileWriter writer = new FileWriter("config.json")) {
             Gson gson = new Gson();
             gson.toJson(this, writer);
         } catch (IOException e) {
-            System.out.println("Error saving configuration.");
+            System.out.println("Error saving configuration: " + e.getMessage());
         }
     }
 
-    // Print the configuration
+    // Prompt user to configure system
+    public static Configuration configureSystem() {
+        Configuration config = new Configuration();
+
+        // Use scanner or another method to get user input for the configuration
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+
+        System.out.print("Enter total number of tickets: ");
+        config.setTotalTickets(scanner.nextInt());
+
+        System.out.print("Enter ticket release rate (milliseconds): ");
+        config.setTicketReleaseRate(scanner.nextInt());
+
+        System.out.print("Enter customer retrieval rate (milliseconds): ");
+        config.setCustomerRetrievalRate(scanner.nextInt());
+
+        System.out.print("Enter maximum ticket capacity: ");
+        config.setMaxTicketCapacity(scanner.nextInt());
+
+        return config;
+    }
+
+    // Print current configuration
     public void printConfiguration() {
-        System.out.println("Configuration Loaded:");
         System.out.println("Total Tickets: " + totalTickets);
         System.out.println("Ticket Release Rate: " + ticketReleaseRate);
         System.out.println("Customer Retrieval Rate: " + customerRetrievalRate);
         System.out.println("Max Ticket Capacity: " + maxTicketCapacity);
-    }
-
-    // Validate user input and prompt again if invalid
-    public static int promptForValidInput(String promptMessage) {
-        Scanner scanner = new Scanner(System.in);
-        int input = -1;
-        while (input <= 0) {
-            System.out.print(promptMessage);
-            try {
-                input = Integer.parseInt(scanner.nextLine());
-                if (input <= 0) {
-                    System.out.println("Please enter a positive integer.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a positive integer.");
-            }
-        }
-        return input;
-    }
-
-    // Method to configure system settings via CLI
-    public static Configuration configureSystem() {
-        int totalTickets = promptForValidInput("Enter total number of tickets: ");
-        int ticketReleaseRate = promptForValidInput("Enter ticket release rate: ");
-        int customerRetrievalRate = promptForValidInput("Enter customer retrieval rate: ");
-        int maxTicketCapacity = promptForValidInput("Enter maximum ticket capacity: ");
-
-        return new Configuration(totalTickets, ticketReleaseRate, customerRetrievalRate, maxTicketCapacity);
     }
 }
