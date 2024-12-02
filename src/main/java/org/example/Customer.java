@@ -2,31 +2,31 @@ package org.example;
 
 public class Customer implements Runnable {
     private final TicketPool ticketPool;
-    private final String name;
-    private final int retrievalRate;  // Rate at which customers retrieve tickets
+    private final String customerName;  // Customer's name (String)
+    private final int customerRetrievalRate; // Customer's retrieval rate (milliseconds)
 
-    // Constructor modified to accept retrieval rate
-    public Customer(TicketPool ticketPool, String name, int retrievalRate) {
+    // Constructor updated to accept the retrieval rate (int) and name (String)
+    public Customer(TicketPool ticketPool, String customerName, int customerRetrievalRate) {
         this.ticketPool = ticketPool;
-        this.name = name;
-        this.retrievalRate = retrievalRate;  // Initialize retrieval rate
+        this.customerName = customerName;
+        this.customerRetrievalRate = customerRetrievalRate;
     }
 
     @Override
     public void run() {
         try {
             while (true) {
-                // Simulate customer retrieval rate (wait for a while based on retrieval rate)
-                Thread.sleep(retrievalRate);
+                // Simulate customer retrieving a ticket with a delay based on retrieval rate
+                Thread.sleep(customerRetrievalRate);  // Use the configured retrieval rate
 
                 // Simulate retrieving a ticket from the pool
-                ticketPool.retrieveTicket(name);
+                ticketPool.retrieveTicket(customerName);
 
                 // Print message when a customer retrieves a ticket
-                System.out.println(name + " retrieved a ticket!");
+                System.out.println(customerName + " retrieved a ticket!");
             }
         } catch (InterruptedException e) {
-            System.err.println(name + " was interrupted: " + e.getMessage());
+            System.err.println(customerName + " was interrupted: " + e.getMessage());
         }
     }
 }
