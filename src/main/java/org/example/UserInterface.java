@@ -19,7 +19,7 @@ public class UserInterface {
         // Initialize Ticketing System with loaded settings
         TicketPool ticketPool = new TicketPool(config.getMaxTicketCapacity());
         Vendor vendor = new Vendor(ticketPool, "Vendor-1", config.getTicketReleaseRate());
-        Customer customer = new Customer(ticketPool, config.getCustomerRetrievalRate());
+        Customer customer = new Customer(ticketPool, config.getCustomerRetrievalRate()); // Pass int instead of String
 
         Thread vendorThread = new Thread(vendor);
         Thread customerThread = new Thread(customer);
