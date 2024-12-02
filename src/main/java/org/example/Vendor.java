@@ -1,38 +1,26 @@
 package org.example;
 
 public class Vendor implements Runnable {
-    private final TicketPool ticketPool;
-    private final String vendorId;
-    private final int ticketsPerRelease;
-    private volatile boolean running = true;
+    private TicketPool ticketPool;
+    private String name;
+    private int ticketReleaseRate;
 
-    public Vendor(TicketPool ticketPool, String vendorId, int ticketsPerRelease) {
+    public Vendor(TicketPool ticketPool, String name, int ticketReleaseRate) {
         this.ticketPool = ticketPool;
-        this.vendorId = vendorId;
-        this.ticketsPerRelease = ticketsPerRelease;
-    }
-
-    public void stop() {
-        running = false;
+        this.name = name;
+        this.ticketReleaseRate = ticketReleaseRate;
     }
 
     @Override
     public void run() {
-        try {
-            int ticketId = 1;
-            while (running) {
-                for (int i = 0; i < ticketsPerRelease; i++) {
-                    if (!running) break;
-                    Ticket ticket = new Ticket(ticketId++, "Event Simple", 1000.0);
-                    ticketPool.addTicket(ticket);
-                    System.out.println("Vendor-" + vendorId + " has added a ticket to the Pool. Current size is " + ticketPool.getTicketCount());
-                    Thread.sleep(500); // Simulate ticket generation time
-                }
+        // Vendor ticket releasing logic
+        while (true) {
+            ticketPool.retrieveTicket();
+            try {
+                Thread.sleep(ticketReleaseRate); // Simulate time taken to release a ticket
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            System.out.println("Vendor " + vendorId + " interrupted.");
-            Thread.currentThread().interrupt();
         }
     }
 }
-
