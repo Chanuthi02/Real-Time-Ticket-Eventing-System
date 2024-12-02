@@ -20,7 +20,7 @@ public class Customer implements Runnable {
                 Thread.sleep(customerRetrievalRate);  // Use the configured retrieval rate
 
                 // Simulate retrieving a ticket from the pool
-                ticketPool.retrieveTicket(customerName);
+                ticketPool.retrieveTicket(customerName); // Pass customer name
 
                 // Print message when a customer retrieves a ticket
                 System.out.println(customerName + " retrieved a ticket!");
