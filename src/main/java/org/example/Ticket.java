@@ -1,11 +1,12 @@
 package org.example;
 
 public class Ticket {
-    private final int ticketId;
+    private final String ticketId;  // Changed to String
     private final String eventName;
     private final double ticketPrice;
 
-    public Ticket(int ticketId, String eventName, double ticketPrice) {
+    // Constructor updated to accept String for ticketId
+    public Ticket(String ticketId, String eventName, double ticketPrice) {
         this.ticketId = ticketId;
         this.eventName = eventName;
         this.ticketPrice = ticketPrice;
@@ -13,10 +14,6 @@ public class Ticket {
 
     @Override
     public String toString() {
-        return "Ticket{ticketId=" + ticketId +
-                ", eventName='" + eventName + '\'' +
-                ", ticketPrice=" + ticketPrice +
-                '}';
+        return "Ticket{ticketId='" + ticketId + "', eventName='" + eventName + "', ticketPrice=" + ticketPrice + "}";
     }
 }
-
