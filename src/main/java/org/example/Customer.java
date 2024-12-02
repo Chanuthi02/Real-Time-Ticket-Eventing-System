@@ -1,31 +1,25 @@
 package org.example;
 
 public class Customer implements Runnable {
-    private final TicketPool ticketPool;
-    private final String customerId;
-    private volatile boolean running = true;
+    private TicketPool ticketPool;
+    private int customerRetrievalRate; // Now an int
 
-    public Customer(TicketPool ticketPool, String customerId) {
+    // Constructor updated to accept int
+    public Customer(TicketPool ticketPool, int customerRetrievalRate) {
         this.ticketPool = ticketPool;
-        this.customerId = customerId;
-    }
-
-    public void stop() {
-        running = false;
+        this.customerRetrievalRate = customerRetrievalRate;
     }
 
     @Override
     public void run() {
-        try {
-            while (running) {
-                Ticket ticket = ticketPool.removeTicket();
-                System.out.println("Ticket bought by " + customerId + ". Ticket is " + ticket);
-                Thread.sleep(700); // Simulate customer purchase interval
+        // Customer ticket retrieval logic
+        while (true) {
+            ticketPool.retrieveTicket();
+            try {
+                Thread.sleep(customerRetrievalRate); // Simulate time taken to retrieve tickets
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            System.out.println("Customer " + customerId + " interrupted.");
-            Thread.currentThread().interrupt();
         }
     }
 }
-
