@@ -1,10 +1,11 @@
 package org.example;
 
 public class Vendor implements Runnable {
-    private TicketPool ticketPool;
-    private String name;
-    private int ticketReleaseRate;
+    private final TicketPool ticketPool;
+    private final String name;
+    private final int ticketReleaseRate;
 
+    // Constructor updated to accept ticket release rate
     public Vendor(TicketPool ticketPool, String name, int ticketReleaseRate) {
         this.ticketPool = ticketPool;
         this.name = name;
@@ -13,14 +14,18 @@ public class Vendor implements Runnable {
 
     @Override
     public void run() {
-        // Vendor ticket releasing logic
-        while (true) {
-            ticketPool.retrieveTicket();
-            try {
-                Thread.sleep(ticketReleaseRate); // Simulate time taken to release a ticket
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+        try {
+            while (true) {
+                // Simulate releasing a ticket with a delay based on release rate
+                Thread.sleep(ticketReleaseRate);
+
+                // Create a new ticket and add it to the pool
+                Ticket ticket = new Ticket("Ticket-" + System.currentTimeMillis(), "Event", 100.0);
+                ticketPool.addTicket(ticket); // Add the ticket to the pool
+                System.out.println(name + " added a ticket.");
             }
+        } catch (InterruptedException e) {
+            System.err.println(name + " was interrupted: " + e.getMessage());
         }
     }
 }
