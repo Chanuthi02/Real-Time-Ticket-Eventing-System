@@ -15,16 +15,15 @@ public class UserInterface {
         // Print the loaded or configured settings
         config.printConfiguration();
 
-        // Example output based on configuration (you can replace this with actual ticket system logic)
         // Initialize Ticketing System with loaded settings
         TicketPool ticketPool = new TicketPool(config.getMaxTicketCapacity());
 
-        // Create and start vendor threads (ticket release rate based on configuration)
+        // Create and start vendor threads
         Vendor vendor = new Vendor(ticketPool, "Vendor-1", config.getTicketReleaseRate());
         Thread vendorThread = new Thread(vendor);
 
-        // Create and start customer threads (customer retrieval rate based on configuration)
-        Customer customer = new Customer(ticketPool, "Customer-1", config.getCustomerRetrievalRate()); // Pass name and rate
+        // Create and start customer threads
+        Customer customer = new Customer(ticketPool, "Customer-1", config.getCustomerRetrievalRate());
         Thread customerThread = new Thread(customer);
 
         // Start the vendor and customer threads
