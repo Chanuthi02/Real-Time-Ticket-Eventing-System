@@ -20,6 +20,11 @@ public class Customer implements Runnable {
             while (running) {
                 Ticket ticket = ticketPool.removeTicket();
                 if (ticket != null) {
+                    // Add ticket information to customerDetails using getter
+                    synchronized (UserInterface.class) {
+                        UserInterface userInterface = new UserInterface();
+                        userInterface.getCustomerDetails().add("Customer ID: " + customerId + " - Purchased Ticket: " + ticket);
+                    }
                     System.out.println("Ticket bought by " + customerId + ". Ticket is " + ticket);
                 }
                 Thread.sleep(700); // Simulate customer purchase interval
