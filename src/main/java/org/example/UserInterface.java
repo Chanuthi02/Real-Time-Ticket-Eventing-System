@@ -1,33 +1,41 @@
 package org.example;
 
-public class UserInterface {
-    public static void main(String[] args) {
-        // Load existing configuration, if any
-        Configuration config = Configuration.loadConfiguration();
+import com.google.gson.Gson;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
-        // Ask user to configure the system if no saved configuration exists
-        if (config.getTotalTickets() == 100) {
-            System.out.println("No configuration found. Please enter system configuration.");
-            config = Configuration.configureSystem();
-            config.saveConfiguration(); // Save the configuration for future runs
+public class Configuration {
+    private static final String CONFIG_FILE = "config.json";
+
+    public static int MAX_TICKET_CAPACITY = 10;
+    public static int TICKET_RELEASE_RATE = 5;
+
+    // Load configuration from a JSON file
+    public static Configuration loadConfiguration() {
+        try (FileReader reader = new FileReader(CONFIG_FILE)) {
+            return new Gson().fromJson(reader, Configuration.class);
+        } catch (IOException e) {
+            System.err.println("Error loading configuration. Using default values: " + e.getMessage());
+            return new Configuration(); // Return default configuration if file not found
         }
+    }
 
-        // Print the loaded or configured settings
-        config.printConfiguration();
+    // Save configuration to a JSON file
+    public void saveConfiguration() {
+        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+            new Gson().toJson(this, writer);
+            System.out.println("Configuration saved successfully.");
+        } catch (IOException e) {
+            System.err.println("Error saving configuration: " + e.getMessage());
+        }
+    }
 
-        // Initialize Ticketing System with loaded settings
-        TicketPool ticketPool = new TicketPool(config.getMaxTicketCapacity());
-
-        // Create and start vendor threads
-        Vendor vendor = new Vendor(ticketPool, "Vendor-1", config.getTicketReleaseRate());
-        Thread vendorThread = new Thread(vendor);
-
-        // Create and start customer threads
-        Customer customer = new Customer(ticketPool, "Customer-1", config.getCustomerRetrievalRate());
-        Thread customerThread = new Thread(customer);
-
-        // Start the vendor and customer threads
-        vendorThread.start();
-        customerThread.start();
+    @Override
+    public String toString() {
+        return "Configuration{" +
+                "MAX_TICKET_CAPACITY=" + MAX_TICKET_CAPACITY +
+                ", TICKET_RELEASE_RATE=" + TICKET_RELEASE_RATE +
+                '}';
     }
 }

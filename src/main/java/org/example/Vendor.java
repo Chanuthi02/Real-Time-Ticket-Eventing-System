@@ -2,30 +2,36 @@ package org.example;
 
 public class Vendor implements Runnable {
     private final TicketPool ticketPool;
-    private final String name;
-    private final int ticketReleaseRate;
+    private final String vendorId;
+    private final int ticketsPerRelease;
+    private volatile boolean running = true;
 
-    // Constructor updated to accept ticket release rate
-    public Vendor(TicketPool ticketPool, String name, int ticketReleaseRate) {
+    public Vendor(TicketPool ticketPool, String vendorId, int ticketsPerRelease) {
         this.ticketPool = ticketPool;
-        this.name = name;
-        this.ticketReleaseRate = ticketReleaseRate;
+        this.vendorId = vendorId;
+        this.ticketsPerRelease = ticketsPerRelease;
+    }
+
+    public void stop() {
+        running = false;
     }
 
     @Override
     public void run() {
         try {
-            while (true) {
-                // Simulate releasing a ticket with a delay based on release rate
-                Thread.sleep(ticketReleaseRate);
-
-                // Create a new ticket with a String ticket ID and add it to the pool
-                Ticket ticket = new Ticket("Ticket-" + System.currentTimeMillis(), "Event", 100.0);
-                ticketPool.addTicket(ticket); // Add the ticket to the pool
-                System.out.println(name + " added a ticket.");
+            int ticketId = 1;
+            while (running) {
+                for (int i = 0; i < ticketsPerRelease; i++) {
+                    if (!running) break;
+                    Ticket ticket = new Ticket(ticketId++, "Event Simple", 1000.0);
+                    ticketPool.addTicket(ticket);
+                    System.out.println("Vendor-" + vendorId + " has added a ticket to the Pool. Current size is " + ticketPool.getTicketCount());
+                    Thread.sleep(500); // Simulate ticket generation time
+                }
             }
         } catch (InterruptedException e) {
-            System.err.println(name + " was interrupted: " + e.getMessage());
+            System.out.println("Vendor " + vendorId + " interrupted.");
+            Thread.currentThread().interrupt();
         }
     }
 }
