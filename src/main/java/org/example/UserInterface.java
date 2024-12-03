@@ -1,41 +1,72 @@
 package org.example;
 
-import com.google.gson.Gson;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-public class Configuration {
-    private static final String CONFIG_FILE = "config.json";
+import java.util.ArrayList;
+import java.util.List;
 
-    public static int MAX_TICKET_CAPACITY = 10;
-    public static int TICKET_RELEASE_RATE = 5;
-
-    // Load configuration from a JSON file
-    public static Configuration loadConfiguration() {
-        try (FileReader reader = new FileReader(CONFIG_FILE)) {
-            return new Gson().fromJson(reader, Configuration.class);
-        } catch (IOException e) {
-            System.err.println("Error loading configuration. Using default values: " + e.getMessage());
-            return new Configuration(); // Return default configuration if file not found
-        }
-    }
-
-    // Save configuration to a JSON file
-    public void saveConfiguration() {
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-            new Gson().toJson(this, writer);
-            System.out.println("Configuration saved successfully.");
-        } catch (IOException e) {
-            System.err.println("Error saving configuration: " + e.getMessage());
-        }
-    }
+public class UserInterface extends Application {
+    private final List<Vendor> vendors = new ArrayList<>();
+    private final List<Customer> customers = new ArrayList<>();
+    private TicketPool ticketPool;
 
     @Override
-    public String toString() {
-        return "Configuration{" +
-                "MAX_TICKET_CAPACITY=" + MAX_TICKET_CAPACITY +
-                ", TICKET_RELEASE_RATE=" + TICKET_RELEASE_RATE +
-                '}';
+    public void start(Stage primaryStage) {
+        ticketPool = new TicketPool(Configuration.MAX_TICKET_CAPACITY);
+
+        Button startButton = new Button("Start System");
+        Button stopButton = new Button("Stop System");
+        stopButton.setDisable(true);
+
+        Label ticketCountLabel = new Label("Tickets Available: 0");
+
+        VBox layout = new VBox(10, startButton, stopButton, ticketCountLabel);
+        Scene scene = new Scene(layout, 400, 300);
+
+        startButton.setOnAction(e -> {
+            startSystem();
+            startButton.setDisable(true);
+            stopButton.setDisable(false);
+        });
+
+        stopButton.setOnAction(e -> {
+            stopSystem();
+            startButton.setDisable(false);
+            stopButton.setDisable(true);
+        });
+
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Event Ticketing System");
+        primaryStage.show();
+    }
+
+    private void startSystem() {
+        for (int i = 1; i <= 3; i++) {
+            Vendor vendor = new Vendor(ticketPool, "Vendor-" + i, Configuration.TICKET_RELEASE_RATE);
+            vendors.add(vendor);
+            new Thread(vendor).start();
+        }
+
+        for (int i = 1; i <= 5; i++) {
+            Customer customer = new Customer(ticketPool, "Customer-" + i);
+            customers.add(customer);
+            new Thread(customer).start();
+        }
+    }
+
+    private void stopSystem() {
+        vendors.forEach(Vendor::stop);
+        customers.forEach(Customer::stop);
+        System.out.println("System Stopped.");
+    }
+
+    public static void main(String[] args) {
+        Configuration.loadConfiguration();
+        launch(args);
     }
 }
