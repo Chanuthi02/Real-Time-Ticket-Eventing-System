@@ -12,8 +12,8 @@ import java.util.List;
 public class UserInterface extends Application {
     private final List<Vendor> vendors = new ArrayList<>();
     private final List<Customer> customers = new ArrayList<>();
-    private final List<String> customerDetails = new ArrayList<>();
-    private final List<String> vendorDetails = new ArrayList<>();
+    private final List<String> customerDetails = new ArrayList<>(); // Store customer details and purchased tickets
+    private final List<String> vendorDetails = new ArrayList<>();   // Store vendor details and released tickets
     private TicketPool ticketPool;
 
     @Override
@@ -75,13 +75,13 @@ public class UserInterface extends Application {
         });
 
         viewCustomersButton.setOnAction(e -> {
-            System.out.println("Customer Details:");
-            customerDetails.forEach(System.out::println);
+            System.out.println("Customer Details and Purchased Tickets:");
+            getCustomerDetails().forEach(System.out::println);
         });
 
         viewVendorsButton.setOnAction(e -> {
-            System.out.println("Vendor Details:");
-            vendorDetails.forEach(System.out::println);
+            System.out.println("Vendor Details and Released Tickets:");
+            getVendorDetails().forEach(System.out::println);
         });
 
         // Set up the stage
@@ -91,21 +91,35 @@ public class UserInterface extends Application {
     }
 
     private void startSystem(int totalTickets, int releaseRate, int retrievalRate) {
-        // Initialize vendors
-        for (int i = 1; i <= 3; i++) {
+        // Initialize vendors (10 vendors now)
+        for (int i = 1; i <= 10; i++) { // Updated to 10 vendors
             Vendor vendor = new Vendor(ticketPool, "Vendor-" + i, releaseRate);
             vendors.add(vendor);
-            vendorDetails.add("Vendor ID: Vendor-" + i);
+            vendorDetails.add("Vendor ID: Vendor-" + i + " - Released Tickets: ");
             new Thread(vendor).start();
         }
 
-        // Initialize customers
-        for (int i = 1; i <= 5; i++) {
+        // Initialize customers (20 customers now)
+        for (int i = 1; i <= 20; i++) { // Updated to 20 customers
             Customer customer = new Customer(ticketPool, "Customer-" + i);
             customers.add(customer);
-            customerDetails.add("Customer ID: Customer-" + i);
+            customerDetails.add("Customer ID: Customer-" + i + " - Purchased Tickets: ");
             new Thread(customer).start();
         }
+
+        // Simulate ticket generation for totalTickets
+        new Thread(() -> {
+            int ticketId = 1;
+            while (ticketPool.getTicketCount() < totalTickets) {
+                Ticket ticket = new Ticket(ticketId++, "Event Simple", 1000.0);
+                try {
+                    ticketPool.addTicket(ticket);
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }).start();
     }
 
     private void stopSystem() {
@@ -117,5 +131,14 @@ public class UserInterface extends Application {
     public static void main(String[] args) {
         Configuration.loadConfiguration();
         launch(args);
+    }
+
+    // Getter methods to access the private lists
+    public List<String> getCustomerDetails() {
+        return customerDetails;
+    }
+
+    public List<String> getVendorDetails() {
+        return vendorDetails;
     }
 }
