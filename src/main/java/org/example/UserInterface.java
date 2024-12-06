@@ -96,19 +96,37 @@ public class UserInterface extends Application {
                 int releaseRate = Integer.parseInt(releaseRateField.getText().trim());
                 int retrievalRate = Integer.parseInt(retrievalRateField.getText().trim());
 
+                // Validate ranges
+                if (totalTickets < 1 || totalTickets > 100000) {
+                    throw new IllegalArgumentException("Total Tickets must be between 1 and 100,000.");
+                }
+                if (maxCapacity < 1 || maxCapacity > totalTickets) {
+                    throw new IllegalArgumentException("Max Capacity must be between 1 and Total Tickets.");
+                }
+                if (releaseRate < 100 || releaseRate > 60000) {
+                    throw new IllegalArgumentException("Release Rate must be between 100 ms and 60,000 ms.");
+                }
+                if (retrievalRate < 100 || retrievalRate > 60000) {
+                    throw new IllegalArgumentException("Retrieval Rate must be between 100 ms and 60,000 ms.");
+                }
+
                 // Update configuration and initialize the ticket pool
                 Configuration.MAX_TICKET_CAPACITY = maxCapacity;
                 Configuration.TICKET_RELEASE_RATE = releaseRate;
                 ticketPool = new TicketPool(maxCapacity);
 
+                // Start the system if all validations pass
                 startSystem(totalTickets, releaseRate, retrievalRate);
                 startButton.setDisable(true);
                 stopButton.setDisable(false);
                 statusLabel.setText("System started successfully.");
             } catch (NumberFormatException ex) {
-                statusLabel.setText("Invalid input. Please check values.");
+                statusLabel.setText("Invalid input. Please enter numeric values.");
+            } catch (IllegalArgumentException ex) {
+                statusLabel.setText(ex.getMessage());
             }
         });
+
 
         stopButton.setOnAction(e -> {
             stopSystem();
