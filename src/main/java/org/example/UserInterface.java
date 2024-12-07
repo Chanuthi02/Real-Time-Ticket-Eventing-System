@@ -43,6 +43,7 @@ public class UserInterface extends Application {
 
         Button startButton = new Button("Start System");
         startButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+        startButton.setDisable(true);  // Disable it initially
 
         Button stopButton = new Button("Stop System");
         stopButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
@@ -61,6 +62,10 @@ public class UserInterface extends Application {
         Button signUpButton = new Button("Sign Up");
         signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
 
+        // Submit Button for parameters
+        Button submitButton = new Button("Submit Parameters");
+        submitButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+
         // Layout for UI components
         VBox layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
@@ -68,7 +73,7 @@ public class UserInterface extends Application {
 
         layout.getChildren().addAll(
                 totalTicketsField, maxCapacityField, releaseRateField, retrievalRateField,
-                statusLabel, startButton, stopButton, viewCustomersButton, viewVendorsButton,
+                submitButton, statusLabel, startButton, stopButton, viewCustomersButton, viewVendorsButton,
                 loginButton, signUpButton  // Add the Login and Sign Up buttons
         );
 
@@ -78,6 +83,7 @@ public class UserInterface extends Application {
         VBox.setMargin(releaseRateField, new javafx.geometry.Insets(10));
         VBox.setMargin(retrievalRateField, new javafx.geometry.Insets(10));
         VBox.setMargin(statusLabel, new javafx.geometry.Insets(10));
+        VBox.setMargin(submitButton, new javafx.geometry.Insets(10));
         VBox.setMargin(startButton, new javafx.geometry.Insets(10));
         VBox.setMargin(stopButton, new javafx.geometry.Insets(10));
         VBox.setMargin(viewCustomersButton, new javafx.geometry.Insets(10));
@@ -88,7 +94,9 @@ public class UserInterface extends Application {
         Scene scene = new Scene(layout, 500, 600);
 
         // Button Actions
-        startButton.setOnAction(e -> {
+
+        // Submit Button Action
+        submitButton.setOnAction(e -> {
             try {
                 // Validate and parse inputs
                 int totalTickets = Integer.parseInt(totalTicketsField.getText().trim());
@@ -115,11 +123,10 @@ public class UserInterface extends Application {
                 Configuration.TICKET_RELEASE_RATE = releaseRate;
                 ticketPool = new TicketPool(maxCapacity);
 
-                // Start the system if all validations pass
-                startSystem(totalTickets, releaseRate, retrievalRate);
-                startButton.setDisable(true);
-                stopButton.setDisable(false);
-                statusLabel.setText("System started successfully.");
+                // Enable the start button after validation passes
+                startButton.setDisable(false);
+                statusLabel.setText("Parameters Validated! Click Start to begin.");
+
             } catch (NumberFormatException ex) {
                 statusLabel.setText("Invalid input. Please enter numeric values.");
             } catch (IllegalArgumentException ex) {
@@ -127,6 +134,14 @@ public class UserInterface extends Application {
             }
         });
 
+        startButton.setOnAction(e -> {
+            startSystem(Integer.parseInt(totalTicketsField.getText()),
+                    Integer.parseInt(releaseRateField.getText()),
+                    Integer.parseInt(retrievalRateField.getText()));
+            startButton.setDisable(true);
+            stopButton.setDisable(false);
+            statusLabel.setText("System started successfully.");
+        });
 
         stopButton.setOnAction(e -> {
             stopSystem();
@@ -145,20 +160,16 @@ public class UserInterface extends Application {
             getVendorDetails().forEach(System.out::println);
         });
 
-        // Login and Sign Up Button Actions
         loginButton.setOnAction(e -> {
             System.out.println("Login Button Clicked");
-            // Add Login logic (e.g., open login window, validate user credentials)
             openLoginWindow();
         });
 
         signUpButton.setOnAction(e -> {
             System.out.println("Sign Up Button Clicked");
-            // Open the Sign Up form
             openSignUpWindow();
         });
 
-        // Set up the stage
         primaryStage.setScene(scene);
         primaryStage.setTitle("Event Ticketing System");
         primaryStage.show();
@@ -233,30 +244,30 @@ public class UserInterface extends Application {
     }
 
     private void startSystem(int totalTickets, int releaseRate, int retrievalRate) {
-        // Initialize vendors (10 vendors now)
-        for (int i = 1; i <= 10; i++) { // Updated to 10 vendors
-            Vendor vendor = new Vendor(ticketPool, "Vendor-" + i, releaseRate);
+        // Initialize vendors
+        for (int i = 1; i <= 10; i++) {
+            Vendor vendor = new Vendor(ticketPool, "Vendor-" + i, releaseRate, this);
             vendors.add(vendor);
             vendorDetails.add("Vendor ID: Vendor-" + i + " - Released Tickets: ");
             new Thread(vendor).start();
         }
 
-        // Initialize customers (20 customers now)
-        for (int i = 1; i <= 20; i++) { // Updated to 20 customers
+        // Initialize customers
+        for (int i = 1; i <= 20; i++) {
             Customer customer = new Customer(ticketPool, "Customer-" + i);
             customers.add(customer);
             customerDetails.add("Customer ID: Customer-" + i + " - Purchased Tickets: ");
             new Thread(customer).start();
         }
 
-        // Simulate ticket generation for totalTickets
+        // Simulate ticket generation
         new Thread(() -> {
             int ticketId = 1;
             while (ticketPool.getTicketCount() < totalTickets) {
                 Ticket ticket = new Ticket(ticketId++, "Event Simple", 1000.0);
                 try {
                     ticketPool.addTicket(ticket);
-                    Thread.sleep(500);
+                    Thread.sleep(500); // Simulate ticket generation time
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -275,7 +286,6 @@ public class UserInterface extends Application {
         launch(args);
     }
 
-    // Getter methods to access the private lists
     public List<String> getCustomerDetails() {
         return customerDetails;
     }
