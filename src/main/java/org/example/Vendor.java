@@ -5,14 +5,14 @@ public class Vendor implements Runnable {
     private final String vendorId;
     private final int ticketsPerRelease;
     private volatile boolean running = true;
-    private final UserInterface userInterface;  // Add reference to UserInterface
+    private final UserInterface userInterface;  // Reference to the UserInterface
 
-    // Modify the constructor to take UserInterface as a parameter
+    // Updated Constructor to accept UserInterface
     public Vendor(TicketPool ticketPool, String vendorId, int ticketsPerRelease, UserInterface userInterface) {
         this.ticketPool = ticketPool;
         this.vendorId = vendorId;
         this.ticketsPerRelease = ticketsPerRelease;
-        this.userInterface = userInterface;  // Initialize the reference to UserInterface
+        this.userInterface = userInterface;
     }
 
     public void stop() {
@@ -29,8 +29,8 @@ public class Vendor implements Runnable {
                     Ticket ticket = new Ticket(ticketId++, "Event Simple", 1000.0);
                     ticketPool.addTicket(ticket);
 
-                    // Add ticket information to vendorDetails using the reference
-                    synchronized (userInterface.getVendorDetails()) {  // Use the existing UI instance
+                    // Update vendor details in the UserInterface
+                    synchronized (userInterface.getVendorDetails()) {
                         userInterface.getVendorDetails().add("Vendor ID: " + vendorId + " - Released Ticket: " + ticket);
                     }
 
