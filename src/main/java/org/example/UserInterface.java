@@ -8,7 +8,9 @@ import javafx.stage.Stage;
 import javafx.geometry.Pos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserInterface extends Application {
     private final List<Vendor> vendors = new ArrayList<>();
@@ -16,6 +18,9 @@ public class UserInterface extends Application {
     private final List<String> customerDetails = new ArrayList<>();
     private final List<String> vendorDetails = new ArrayList<>();
     private TicketPool ticketPool;
+
+    // In-memory store for sign-up credentials (username and password)
+    private final Map<String, String> userCredentials = new HashMap<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -143,6 +148,74 @@ public class UserInterface extends Application {
         primaryStage.show();
     }
 
+    private void openLoginWindow() {
+        Stage loginStage = new Stage();
+        loginStage.setTitle("Login");
+
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter your username");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter your password");
+
+        Button loginButton = new Button("Login");
+        Label loginStatus = new Label();
+        loginButton.setOnAction(e -> {
+            String username = usernameField.getText().trim();
+            String password = passwordField.getText().trim();
+
+            if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)) {
+                loginStatus.setText("Login successful!");
+            } else {
+                loginStatus.setText("Invalid username or password.");
+            }
+        });
+
+        VBox layout = new VBox(10, usernameField, passwordField, loginButton, loginStatus);
+        layout.setAlignment(Pos.CENTER);
+        loginStage.setScene(new Scene(layout, 300, 200));
+        loginStage.show();
+    }
+
+    private void openSignUpWindow() {
+        Stage signUpStage = new Stage();
+        signUpStage.setTitle("Sign Up");
+
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Enter your username");
+
+        TextField emailField = new TextField();
+        emailField.setPromptText("Enter your email");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter your password");
+
+        Label signUpStatus = new Label();
+
+        Button signUpButton = new Button("Sign Up");
+        signUpButton.setOnAction(e -> {
+            String username = usernameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = passwordField.getText().trim();
+
+            if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                signUpStatus.setText("All fields are required.");
+            } else if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
+                signUpStatus.setText("Invalid email format.");
+            } else if (userCredentials.containsKey(username)) {
+                signUpStatus.setText("Username already exists.");
+            } else {
+                userCredentials.put(username, password);
+                signUpStatus.setText("Sign-up successful!");
+            }
+        });
+
+        VBox layout = new VBox(10, usernameField, emailField, passwordField, signUpButton, signUpStatus);
+        layout.setAlignment(Pos.CENTER);
+        signUpStage.setScene(new Scene(layout, 300, 250));
+        signUpStage.show();
+    }
+
     private void startSystem(int totalTickets, int releaseRate, int retrievalRate) {
         for (int i = 1; i <= 10; i++) {
             Vendor vendor = new Vendor(ticketPool, "Vendor-" + i, releaseRate, this);
@@ -163,37 +236,6 @@ public class UserInterface extends Application {
         vendors.forEach(Vendor::stop);
         customers.forEach(Customer::stop);
         System.out.println("System Stopped.");
-    }
-
-    private void openLoginWindow() {
-        Stage loginStage = new Stage();
-        loginStage.setTitle("Login");
-
-        TextField usernameField = new TextField("Enter your username");
-        PasswordField passwordField = new PasswordField();
-        Button loginButton = new Button("Login");
-        loginButton.setOnAction(e -> loginStage.close());
-
-        VBox layout = new VBox(10, usernameField, passwordField, loginButton);
-        layout.setAlignment(Pos.CENTER);
-        loginStage.setScene(new Scene(layout, 300, 200));
-        loginStage.show();
-    }
-
-    private void openSignUpWindow() {
-        Stage signUpStage = new Stage();
-        signUpStage.setTitle("Sign Up");
-
-        TextField usernameField = new TextField("Enter your username");
-        TextField emailField = new TextField("Enter your email");
-        PasswordField passwordField = new PasswordField();
-        Button signUpButton = new Button("Sign Up");
-        signUpButton.setOnAction(e -> signUpStage.close());
-
-        VBox layout = new VBox(10, usernameField, emailField, passwordField, signUpButton);
-        layout.setAlignment(Pos.CENTER);
-        signUpStage.setScene(new Scene(layout, 300, 250));
-        signUpStage.show();
     }
 
     public static void main(String[] args) {
