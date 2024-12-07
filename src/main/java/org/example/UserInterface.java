@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +37,15 @@ public class UserInterface extends Application {
         retrievalRateField.setStyle("-fx-padding: 10; -fx-font-size: 14px;");
 
         // Labels and buttons
-        Label statusLabel = new Label("Tickets Available: 0");
-        statusLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: green;");
+        Label statusLabel = new Label("System Status: Waiting for Input");
+        statusLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: blue;");
+
+        Button submitButton = new Button("Submit Parameters");
+        submitButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
 
         Button startButton = new Button("Start System");
         startButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
-        startButton.setDisable(true);  // Disable it initially
+        startButton.setDisable(true);  // Disabled initially
 
         Button stopButton = new Button("Stop System");
         stopButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
@@ -55,56 +57,32 @@ public class UserInterface extends Application {
         Button viewVendorsButton = new Button("View Vendors");
         viewVendorsButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
 
-        // Add Login and Sign Up buttons
         Button loginButton = new Button("Login");
         loginButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
 
         Button signUpButton = new Button("Sign Up");
         signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
 
-        // Submit Button for parameters
-        Button submitButton = new Button("Submit Parameters");
-        submitButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
-
         // Layout for UI components
         VBox layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-background-color: #f4f4f9; -fx-padding: 20;");
-
         layout.getChildren().addAll(
                 totalTicketsField, maxCapacityField, releaseRateField, retrievalRateField,
-                submitButton, statusLabel, startButton, stopButton, viewCustomersButton, viewVendorsButton,
-                loginButton, signUpButton  // Add the Login and Sign Up buttons
+                submitButton, statusLabel, startButton, stopButton,
+                viewCustomersButton, viewVendorsButton, loginButton, signUpButton
         );
-
-        // Add some margin around each component
-        VBox.setMargin(totalTicketsField, new javafx.geometry.Insets(10));
-        VBox.setMargin(maxCapacityField, new javafx.geometry.Insets(10));
-        VBox.setMargin(releaseRateField, new javafx.geometry.Insets(10));
-        VBox.setMargin(retrievalRateField, new javafx.geometry.Insets(10));
-        VBox.setMargin(statusLabel, new javafx.geometry.Insets(10));
-        VBox.setMargin(submitButton, new javafx.geometry.Insets(10));
-        VBox.setMargin(startButton, new javafx.geometry.Insets(10));
-        VBox.setMargin(stopButton, new javafx.geometry.Insets(10));
-        VBox.setMargin(viewCustomersButton, new javafx.geometry.Insets(10));
-        VBox.setMargin(viewVendorsButton, new javafx.geometry.Insets(10));
-        VBox.setMargin(loginButton, new javafx.geometry.Insets(10));
-        VBox.setMargin(signUpButton, new javafx.geometry.Insets(10));
 
         Scene scene = new Scene(layout, 500, 600);
 
         // Button Actions
-
-        // Submit Button Action
         submitButton.setOnAction(e -> {
             try {
-                // Validate and parse inputs
                 int totalTickets = Integer.parseInt(totalTicketsField.getText().trim());
                 int maxCapacity = Integer.parseInt(maxCapacityField.getText().trim());
                 int releaseRate = Integer.parseInt(releaseRateField.getText().trim());
                 int retrievalRate = Integer.parseInt(retrievalRateField.getText().trim());
 
-                // Validate ranges
                 if (totalTickets < 1 || totalTickets > 100000) {
                     throw new IllegalArgumentException("Total Tickets must be between 1 and 100,000.");
                 }
@@ -118,15 +96,12 @@ public class UserInterface extends Application {
                     throw new IllegalArgumentException("Retrieval Rate must be between 100 ms and 60,000 ms.");
                 }
 
-                // Update configuration and initialize the ticket pool
                 Configuration.MAX_TICKET_CAPACITY = maxCapacity;
                 Configuration.TICKET_RELEASE_RATE = releaseRate;
                 ticketPool = new TicketPool(maxCapacity);
 
-                // Enable the start button after validation passes
                 startButton.setDisable(false);
-                statusLabel.setText("Parameters Validated! Click Start to begin.");
-
+                statusLabel.setText("Parameters Submitted. Ready to Start.");
             } catch (NumberFormatException ex) {
                 statusLabel.setText("Invalid input. Please enter numeric values.");
             } catch (IllegalArgumentException ex) {
@@ -140,14 +115,14 @@ public class UserInterface extends Application {
                     Integer.parseInt(retrievalRateField.getText()));
             startButton.setDisable(true);
             stopButton.setDisable(false);
-            statusLabel.setText("System started successfully.");
+            statusLabel.setText("System Started!");
         });
 
         stopButton.setOnAction(e -> {
             stopSystem();
             startButton.setDisable(false);
             stopButton.setDisable(true);
-            statusLabel.setText("System stopped.");
+            statusLabel.setText("System Stopped.");
         });
 
         viewCustomersButton.setOnAction(e -> {
@@ -160,91 +135,15 @@ public class UserInterface extends Application {
             getVendorDetails().forEach(System.out::println);
         });
 
-        loginButton.setOnAction(e -> {
-            System.out.println("Login Button Clicked");
-            openLoginWindow();
-        });
-
-        signUpButton.setOnAction(e -> {
-            System.out.println("Sign Up Button Clicked");
-            openSignUpWindow();
-        });
+        loginButton.setOnAction(e -> openLoginWindow());
+        signUpButton.setOnAction(e -> openSignUpWindow());
 
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Event Ticketing System");
+        primaryStage.setTitle("Event Ticketing System - GUI");
         primaryStage.show();
     }
 
-    // Function to open the Login window
-    private void openLoginWindow() {
-        Stage loginStage = new Stage();
-        loginStage.setTitle("Login");
-
-        // Create login fields
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Enter your username");
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter your password");
-
-        Button loginBtn = new Button("Login");
-        loginBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-
-        loginBtn.setOnAction(e -> {
-            String username = usernameField.getText();
-            String password = passwordField.getText();
-            // Here you can add login logic (e.g., check username/password)
-            System.out.println("Username: " + username + ", Password: " + password);
-            loginStage.close();  // Close the login window after clicking login
-        });
-
-        VBox loginLayout = new VBox(10, usernameField, passwordField, loginBtn);
-        loginLayout.setAlignment(Pos.CENTER);
-        loginLayout.setStyle("-fx-padding: 20;");
-
-        Scene loginScene = new Scene(loginLayout, 300, 200);
-        loginStage.setScene(loginScene);
-        loginStage.show();
-    }
-
-    // Function to open the Sign Up window
-    private void openSignUpWindow() {
-        Stage signUpStage = new Stage();
-        signUpStage.setTitle("Sign Up");
-
-        // Create sign-up fields
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Enter your username");
-
-        TextField emailField = new TextField();
-        emailField.setPromptText("Enter your email");
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter your password");
-
-        Button signUpBtn = new Button("Sign Up");
-        signUpBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-
-        signUpBtn.setOnAction(e -> {
-            String username = usernameField.getText();
-            String email = emailField.getText();
-            String password = passwordField.getText();
-            // Here you can add sign-up logic (e.g., save user details)
-            System.out.println("Sign Up Details - Username: " + username + ", Email: " + email + ", Password: " + password);
-            signUpStage.close();  // Close the sign-up window after clicking sign-up
-        });
-
-        VBox signUpLayout = new VBox(10, usernameField, emailField, passwordField, signUpBtn);
-        signUpLayout.setAlignment(Pos.CENTER);
-        signUpLayout.setStyle("-fx-padding: 20;");
-
-        Scene signUpScene = new Scene(signUpLayout, 300, 250);
-        signUpStage.setScene(signUpScene);
-        signUpStage.show();
-    }
-
     private void startSystem(int totalTickets, int releaseRate, int retrievalRate) {
-        // Initialize vendors
         for (int i = 1; i <= 10; i++) {
             Vendor vendor = new Vendor(ticketPool, "Vendor-" + i, releaseRate, this);
             vendors.add(vendor);
@@ -252,27 +151,12 @@ public class UserInterface extends Application {
             new Thread(vendor).start();
         }
 
-        // Initialize customers
         for (int i = 1; i <= 20; i++) {
             Customer customer = new Customer(ticketPool, "Customer-" + i);
             customers.add(customer);
             customerDetails.add("Customer ID: Customer-" + i + " - Purchased Tickets: ");
             new Thread(customer).start();
         }
-
-        // Simulate ticket generation
-        new Thread(() -> {
-            int ticketId = 1;
-            while (ticketPool.getTicketCount() < totalTickets) {
-                Ticket ticket = new Ticket(ticketId++, "Event Simple", 1000.0);
-                try {
-                    ticketPool.addTicket(ticket);
-                    Thread.sleep(500); // Simulate ticket generation time
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }).start();
     }
 
     private void stopSystem() {
@@ -281,8 +165,38 @@ public class UserInterface extends Application {
         System.out.println("System Stopped.");
     }
 
+    private void openLoginWindow() {
+        Stage loginStage = new Stage();
+        loginStage.setTitle("Login");
+
+        TextField usernameField = new TextField("Enter your username");
+        PasswordField passwordField = new PasswordField();
+        Button loginButton = new Button("Login");
+        loginButton.setOnAction(e -> loginStage.close());
+
+        VBox layout = new VBox(10, usernameField, passwordField, loginButton);
+        layout.setAlignment(Pos.CENTER);
+        loginStage.setScene(new Scene(layout, 300, 200));
+        loginStage.show();
+    }
+
+    private void openSignUpWindow() {
+        Stage signUpStage = new Stage();
+        signUpStage.setTitle("Sign Up");
+
+        TextField usernameField = new TextField("Enter your username");
+        TextField emailField = new TextField("Enter your email");
+        PasswordField passwordField = new PasswordField();
+        Button signUpButton = new Button("Sign Up");
+        signUpButton.setOnAction(e -> signUpStage.close());
+
+        VBox layout = new VBox(10, usernameField, emailField, passwordField, signUpButton);
+        layout.setAlignment(Pos.CENTER);
+        signUpStage.setScene(new Scene(layout, 300, 250));
+        signUpStage.show();
+    }
+
     public static void main(String[] args) {
-        Configuration.loadConfiguration();
         launch(args);
     }
 
