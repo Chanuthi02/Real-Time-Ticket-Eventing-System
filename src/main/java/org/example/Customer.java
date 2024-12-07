@@ -19,19 +19,23 @@ public class Customer implements Runnable {
         try {
             while (running) {
                 Ticket ticket = ticketPool.removeTicket();
-                if (ticket != null) {
-                    // Add ticket information to customerDetails using getter
-                    synchronized (UserInterface.class) {
-                        UserInterface userInterface = new UserInterface();
-                        userInterface.getCustomerDetails().add("Customer ID: " + customerId + " - Purchased Ticket: " + ticket);
-                    }
-                    System.out.println("Ticket bought by " + customerId + ". Ticket is " + ticket);
-                }
+                System.out.println("Ticket bought by " + customerId + ". Ticket is " + ticket);
                 Thread.sleep(700); // Simulate customer purchase interval
+
+                // Simulate the customer deciding to cancel the ticket after some time
+                if (Math.random() < 0.5) { // 50% chance to cancel
+                    cancelTicket(ticket);
+                }
             }
         } catch (InterruptedException e) {
             System.out.println("Customer " + customerId + " interrupted.");
             Thread.currentThread().interrupt();
         }
+    }
+
+    // Method for customer to cancel a ticket
+    public void cancelTicket(Ticket ticket) {
+        System.out.println("Customer " + customerId + " is canceling ticket: " + ticket);
+        ticketPool.cancelTicket(ticket); // Return the ticket to the pool
     }
 }
