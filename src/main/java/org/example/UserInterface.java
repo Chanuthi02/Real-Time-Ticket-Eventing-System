@@ -17,6 +17,11 @@ public class UserInterface extends Application {
     private final List<String> vendorDetails = new ArrayList<>();
     private TicketPool ticketPool;
 
+    // ComboBox to select customer and ticket
+    private ComboBox<String> customerComboBox;
+    private ComboBox<String> ticketComboBox;
+    private Label cancelStatusLabel; // Label to display cancellation status
+
     @Override
     public void start(Stage primaryStage) {
         // Input fields for system parameters
@@ -51,11 +56,23 @@ public class UserInterface extends Application {
         stopButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
         stopButton.setDisable(true);
 
+        Button cancelTicketButton = new Button("Cancel Ticket");
+        cancelTicketButton.setStyle("-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14px;");
+        cancelTicketButton.setDisable(true);  // Disabled initially
+
         Button viewCustomersButton = new Button("View Customers");
         viewCustomersButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
 
         Button viewVendorsButton = new Button("View Vendors");
         viewVendorsButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
+
+        // ComboBoxes for selecting customer and ticket
+        customerComboBox = new ComboBox<>();
+        ticketComboBox = new ComboBox<>();
+
+        // Label to display the cancel ticket status
+        cancelStatusLabel = new Label();
+        cancelStatusLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: red;");
 
         // Layout for UI components
         VBox layout = new VBox(15);
@@ -63,8 +80,8 @@ public class UserInterface extends Application {
         layout.setStyle("-fx-background-color: #f4f4f9; -fx-padding: 20;");
         layout.getChildren().addAll(
                 totalTicketsField, maxCapacityField, releaseRateField, retrievalRateField,
-                submitButton, statusLabel, startButton, stopButton,
-                viewCustomersButton, viewVendorsButton
+                submitButton, statusLabel, startButton, stopButton, cancelTicketButton,
+                customerComboBox, ticketComboBox, cancelStatusLabel, viewCustomersButton, viewVendorsButton
         );
 
         Scene scene = new Scene(layout, 500, 600);
@@ -94,6 +111,7 @@ public class UserInterface extends Application {
                     Integer.parseInt(retrievalRateField.getText()));
             startButton.setDisable(true);
             stopButton.setDisable(false);
+            cancelTicketButton.setDisable(false); // Enable cancel ticket button when system starts
             statusLabel.setText("System Started!");
         });
 
@@ -101,7 +119,12 @@ public class UserInterface extends Application {
             stopSystem();
             startButton.setDisable(false);
             stopButton.setDisable(true);
+            cancelTicketButton.setDisable(true); // Disable cancel ticket button when system stops
             statusLabel.setText("System Stopped.");
+        });
+
+        cancelTicketButton.setOnAction(e -> {
+            cancelTicket();
         });
 
         viewCustomersButton.setOnAction(e -> {
@@ -119,6 +142,38 @@ public class UserInterface extends Application {
         primaryStage.show();
     }
 
+    private void cancelTicket() {
+        // Get selected customer from ComboBox
+        String selectedCustomerId = customerComboBox.getValue();
+        Customer selectedCustomer = null;
+        for (Customer customer : customers) {
+            if (customer.getCustomerId().equals(selectedCustomerId)) {
+                selectedCustomer = customer;
+                break;
+            }
+        }
+
+        // Get selected ticket from ComboBox
+        String selectedTicketInfo = ticketComboBox.getValue();
+        Ticket selectedTicket = null;
+        for (Ticket ticket : selectedCustomer.getPurchasedTickets()) {
+            if (selectedTicketInfo.equals(ticket.toString())) {
+                selectedTicket = ticket;
+                break;
+            }
+        }
+
+        // Cancel the selected ticket
+        if (selectedCustomer != null && selectedTicket != null) {
+            selectedCustomer.cancelTicket(selectedTicket);
+            // Update both the console and the GUI
+            cancelStatusLabel.setText("Ticket canceled by " + selectedCustomer.getCustomerId() + ": " + selectedTicket);
+            System.out.println("Ticket canceled by " + selectedCustomer.getCustomerId() + ": " + selectedTicket);
+        } else {
+            cancelStatusLabel.setText("Invalid ticket or customer selection.");
+        }
+    }
+
     private void startSystem(int totalTickets, int releaseRate, int retrievalRate) {
         for (int i = 1; i <= 10; i++) {
             Vendor vendor = new Vendor(ticketPool, "Vendor-" + i, releaseRate, this);
@@ -133,6 +188,15 @@ public class UserInterface extends Application {
             customerDetails.add("Customer ID: Customer-" + i + " - Purchased Tickets: ");
             new Thread(customer).start();
         }
+
+        // Populate ComboBoxes
+        customerComboBox.getItems().clear();
+        customers.forEach(customer -> customerComboBox.getItems().add(customer.getCustomerId()));
+        customerComboBox.setPromptText("Select Customer");
+
+        ticketComboBox.getItems().clear();
+        customers.get(0).getPurchasedTickets().forEach(ticket -> ticketComboBox.getItems().add(ticket.toString()));
+        ticketComboBox.setPromptText("Select Ticket to Cancel");
     }
 
     private void stopSystem() {
