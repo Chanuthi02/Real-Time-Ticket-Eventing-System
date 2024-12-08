@@ -18,6 +18,8 @@ public class UserInterface extends Application {
     private final List<User> users = new ArrayList<>();
     private final List<String> vendorDetails = new ArrayList<>(); // List to store vendor details (released tickets)
 
+    private Scene mainScene;  // Store the main scene for easy navigation
+
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -36,7 +38,7 @@ public class UserInterface extends Application {
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 20; -fx-background-color: #f4f4f9;");
 
-        Scene mainScene = new Scene(layout, 400, 300);
+        mainScene = new Scene(layout, 400, 300);
 
         // Button actions
         loginButton.setOnAction(e -> openLoginPage(mainScene));
@@ -130,7 +132,7 @@ public class UserInterface extends Application {
                 return;
             }
         }
-        messageLabel.setText("Invalid credentials!");  // Error message
+        messageLabel.setText("Invalid credentials!");
     }
 
     private void handleSignup(String username, String email, String password, String role, Label messageLabel) {
@@ -162,7 +164,7 @@ public class UserInterface extends Application {
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 20; -fx-background-color: #f4f4f9;");
 
-        backButton.setOnAction(e -> primaryStage.setScene(primaryStage.getScene()));
+        backButton.setOnAction(e -> primaryStage.setScene(mainScene));
 
         Scene adminScene = new Scene(layout, 400, 300);
         primaryStage.setScene(adminScene);
@@ -179,7 +181,7 @@ public class UserInterface extends Application {
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 20; -fx-background-color: #f4f4f9;");
 
-        backButton.setOnAction(e -> primaryStage.setScene(primaryStage.getScene()));
+        backButton.setOnAction(e -> primaryStage.setScene(mainScene));
 
         Scene vendorScene = new Scene(layout, 400, 300);
         primaryStage.setScene(vendorScene);
@@ -196,7 +198,7 @@ public class UserInterface extends Application {
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 20; -fx-background-color: #f4f4f9;");
 
-        backButton.setOnAction(e -> primaryStage.setScene(primaryStage.getScene()));
+        backButton.setOnAction(e -> primaryStage.setScene(mainScene));
 
         Scene customerScene = new Scene(layout, 400, 300);
         primaryStage.setScene(customerScene);
