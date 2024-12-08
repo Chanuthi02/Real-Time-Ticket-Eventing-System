@@ -33,7 +33,7 @@ public class Vendor implements Runnable {
 
                     // Add ticket information to vendorDetails
                     synchronized (userInterface.getVendorDetails()) {
-                        userInterface.getVendorDetails().add("Vendor ID: " + vendorId + " - Released Ticket: " + ticket.toString());
+                        userInterface.getVendorDetails().add("Vendor ID: " + vendorId + " - Released Ticket: " + ticket);
                     }
 
                     System.out.println("Vendor-" + vendorId + " has added a ticket to the Pool. Current size is " + ticketPool.getTicketCount());
