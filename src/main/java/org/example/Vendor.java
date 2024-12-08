@@ -32,12 +32,10 @@ public class Vendor implements Runnable {
                     ticketPool.addTicket(ticket);
 
                     // Add ticket information to vendorDetails
-                    synchronized (userInterface) {
-                        List<String> vendorDetailsList = userInterface.getVendorDetails();
-                        if (vendorDetailsList != null) { // Ensure it's not null
-                            vendorDetailsList.add("Vendor ID: " + vendorId + " - Released Ticket: " + ticket.toString());
-                        }
+                    synchronized (userInterface.getVendorDetails()) {
+                        userInterface.getVendorDetails().add("Vendor ID: " + vendorId + " - Released Ticket: " + ticket.toString());
                     }
+
                     System.out.println("Vendor-" + vendorId + " has added a ticket to the Pool. Current size is " + ticketPool.getTicketCount());
                     Thread.sleep(500); // Simulate ticket generation time
                 }
