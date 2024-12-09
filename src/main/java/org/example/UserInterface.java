@@ -21,6 +21,7 @@ public class UserInterface extends Application {
     private TicketPool ticketPool;
 
     private final Map<String, String> userCredentials = new HashMap<>();
+    private final Map<String, String> userRoles = new HashMap<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -143,203 +144,180 @@ public class UserInterface extends Application {
             vendorDetails.forEach(System.out::println);
         });
 
-        cancelTicketButton.setOnAction(e -> openCancelTicketWindow());
+        cancelTicketButton.setOnAction(e -> openCancelTicketWindow(primaryStage));
 
-        loginButton.setOnAction(e -> openLoginWindow());
-        signUpButton.setOnAction(e -> openSignUpWindow());
+        loginButton.setOnAction(e -> openLoginWindow(primaryStage)); // Fixed Login Button
+        signUpButton.setOnAction(e -> openSignUpWindow(primaryStage)); // Fixed Sign-Up Button
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Event Ticketing System - GUI");
         primaryStage.show();
     }
 
-    // Enhanced Login Window
-    private void openLoginWindow() {
-        Stage loginStage = new Stage();
-        loginStage.setTitle("Login");
+    // Cancel Ticket Window with Vendor Details
+    private void openCancelTicketWindow(Stage primaryStage) {
+        Stage cancelStage = new Stage();
+        cancelStage.setTitle("Cancel Ticket");
 
-        // Create VBox for layout
         VBox layout = new VBox(10);
         layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #fff; -fx-padding: 20; -fx-background-radius: 10px;");
+        layout.setStyle("-fx-background-color: #fff; -fx-padding: 20;");
 
-        // Title Label
-        Label titleLabel = new Label("Login to Your Account");
+        Label titleLabel = new Label("Cancel Ticket");
         titleLabel.setFont(Font.font("Arial", 20));
         titleLabel.setStyle("-fx-text-fill: #333;");
 
-        // Username and Password Fields
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Username");
-        usernameField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
+        TextField vendorIdField = new TextField();
+        vendorIdField.setPromptText("Enter Vendor ID");
+        vendorIdField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
-        passwordField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
+        TextField ticketIdField = new TextField();
+        ticketIdField.setPromptText("Enter Ticket ID");
+        ticketIdField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
-        // Login Button with hover effect
-        Button loginButton = new Button("Login");
-        loginButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;");
-        loginButton.setOnMouseEntered(e -> loginButton.setStyle("-fx-background-color: #1976D2; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;"));
-        loginButton.setOnMouseExited(e -> loginButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;"));
+        Button cancelButton = new Button("Cancel Ticket");
+        cancelButton.setStyle("-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14px;");
 
-        // Status label for login
-        Label loginStatus = new Label();
-        loginStatus.setStyle("-fx-font-size: 14px; -fx-text-fill: red;");
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
 
-        // Action for login button
-        loginButton.setOnAction(e -> {
-            String username = usernameField.getText().trim();
-            String password = passwordField.getText().trim();
+        Label statusLabel = new Label();
+        statusLabel.setStyle("-fx-font-size: 14px;");
 
-            if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)) {
-                loginStatus.setText("Login successful!");
+        cancelButton.setOnAction(e -> {
+            String vendorId = vendorIdField.getText().trim();
+            String ticketId = ticketIdField.getText().trim();
+
+            if (vendorId.isEmpty() || ticketId.isEmpty()) {
+                statusLabel.setText("Vendor ID and Ticket ID are required!");
+                statusLabel.setStyle("-fx-text-fill: red;");
             } else {
-                loginStatus.setText("Invalid username or password.");
+                statusLabel.setText("Ticket " + ticketId + " canceled by Vendor " + vendorId + "!");
+                statusLabel.setStyle("-fx-text-fill: green;");
+                Logger.logEvent("Vendor " + vendorId + " canceled Ticket " + ticketId);
             }
         });
 
-        // Add elements to layout
-        layout.getChildren().addAll(titleLabel, usernameField, passwordField, loginButton, loginStatus);
+        backButton.setOnAction(e -> cancelStage.close());
 
-        // Set scene and show
-        loginStage.setScene(new Scene(layout, 300, 250));
+        layout.getChildren().addAll(titleLabel, vendorIdField, ticketIdField, cancelButton, backButton, statusLabel);
+        cancelStage.setScene(new Scene(layout, 400, 300));
+        cancelStage.show();
+    }
+
+    // Login Window
+    private void openLoginWindow(Stage primaryStage) {
+        Stage loginStage = new Stage();
+        loginStage.setTitle("Login");
+
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-background-color: #fff; -fx-padding: 20;");
+
+        Label titleLabel = new Label("Login");
+        titleLabel.setFont(Font.font("Arial", 20));
+
+        TextField usernameField = new TextField();
+        usernameField.setPromptText("Username");
+        usernameField.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
+
+        ChoiceBox<String> roleChoiceBox = new ChoiceBox<>();
+        roleChoiceBox.getItems().addAll("Admin", "Vendor", "Customer");
+        roleChoiceBox.setValue("Customer"); // Default role
+        roleChoiceBox.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3;");
+
+        Button loginButton = new Button("Login");
+        loginButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
+
+        Label statusLabel = new Label();
+        statusLabel.setStyle("-fx-font-size: 14px;");
+
+        loginButton.setOnAction(e -> {
+            String username = usernameField.getText().trim();
+            String password = passwordField.getText().trim();
+            String role = roleChoiceBox.getValue();
+
+            if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)
+                    && userRoles.get(username).equals(role)) {
+                statusLabel.setText("Login successful as " + role + "!");
+                statusLabel.setStyle("-fx-text-fill: green;");
+            } else {
+                statusLabel.setText("Invalid credentials or role!");
+                statusLabel.setStyle("-fx-text-fill: red;");
+            }
+        });
+
+        backButton.setOnAction(e -> loginStage.close());
+
+        layout.getChildren().addAll(titleLabel, usernameField, passwordField, roleChoiceBox, loginButton, backButton, statusLabel);
+        loginStage.setScene(new Scene(layout, 300, 350));
         loginStage.show();
     }
 
-    // Enhanced Sign Up Window
-    private void openSignUpWindow() {
+    // Sign Up Window
+    private void openSignUpWindow(Stage primaryStage) {
         Stage signUpStage = new Stage();
         signUpStage.setTitle("Sign Up");
 
-        // Create VBox for layout
         VBox layout = new VBox(10);
         layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #fff; -fx-padding: 20; -fx-background-radius: 10px;");
+        layout.setStyle("-fx-background-color: #fff; -fx-padding: 20;");
 
-        // Title Label
-        Label titleLabel = new Label("Create Your Account");
+        Label titleLabel = new Label("Sign Up");
         titleLabel.setFont(Font.font("Arial", 20));
-        titleLabel.setStyle("-fx-text-fill: #333;");
 
-        // Input fields for username, email, and password
         TextField usernameField = new TextField();
-        usernameField.setPromptText("Enter your username");
-        usernameField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
+        usernameField.setPromptText("Username");
+        usernameField.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
         TextField emailField = new TextField();
-        emailField.setPromptText("Enter your email");
-        emailField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
+        emailField.setPromptText("Email");
+        emailField.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
         PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter your password");
-        passwordField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
+        passwordField.setPromptText("Password");
+        passwordField.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
-        // Sign-up Button with hover effect
         Button signUpButton = new Button("Sign Up");
-        signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;");
-        signUpButton.setOnMouseEntered(e -> signUpButton.setStyle("-fx-background-color: #1976D2; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;"));
-        signUpButton.setOnMouseExited(e -> signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;"));
+        signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
 
-        // Status label for signup
-        Label signUpStatus = new Label();
-        signUpStatus.setStyle("-fx-font-size: 14px; -fx-text-fill: red;");
+        Label statusLabel = new Label();
+        statusLabel.setStyle("-fx-font-size: 14px;");
 
-        // Action for sign-up button
         signUpButton.setOnAction(e -> {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
             String password = passwordField.getText().trim();
 
             if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                signUpStatus.setText("All fields are required.");
+                statusLabel.setText("All fields are required!");
+                statusLabel.setStyle("-fx-text-fill: red;");
             } else if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
-                signUpStatus.setText("Invalid email format.");
+                statusLabel.setText("Invalid email format!");
+                statusLabel.setStyle("-fx-text-fill: red;");
             } else if (userCredentials.containsKey(username)) {
-                signUpStatus.setText("Username already exists.");
+                statusLabel.setText("Username already exists!");
+                statusLabel.setStyle("-fx-text-fill: red;");
             } else {
                 userCredentials.put(username, password);
-                signUpStatus.setText("Sign-up successful!");
+                statusLabel.setText("Sign-up successful!");
+                statusLabel.setStyle("-fx-text-fill: green;");
             }
         });
 
-        // Add elements to layout
-        layout.getChildren().addAll(titleLabel, usernameField, emailField, passwordField, signUpButton, signUpStatus);
+        backButton.setOnAction(e -> signUpStage.close());
 
-        // Set scene and show
-        signUpStage.setScene(new Scene(layout, 300, 300));
+        layout.getChildren().addAll(titleLabel, usernameField, emailField, passwordField, signUpButton, backButton, statusLabel);
+        signUpStage.setScene(new Scene(layout, 300, 350));
         signUpStage.show();
-    }
-
-    private void openCancelTicketWindow() {
-        // Create a new stage (window) for the Cancel Ticket page
-        Stage cancelStage = new Stage();
-        cancelStage.setTitle("Cancel Ticket");
-
-        // Create a VBox layout for the cancel ticket form
-        VBox cancelLayout = new VBox(10);
-        cancelLayout.setAlignment(Pos.CENTER);
-        cancelLayout.setStyle("-fx-background-color: #fff; -fx-padding: 20; -fx-background-radius: 10px;");
-
-        // Title for the cancel ticket page
-        Label titleLabel = new Label("Cancel Your Ticket");
-        titleLabel.setFont(Font.font("Arial", 20));
-        titleLabel.setStyle("-fx-text-fill: #333;");
-
-        // Vendor ID input field
-        TextField vendorIdField = new TextField();
-        vendorIdField.setPromptText("Enter Vendor ID");
-        vendorIdField.setStyle("-fx-border-color: #2196F3; -fx-background-color: #f0f8ff; -fx-padding: 8px; -fx-font-size: 14px;");
-
-        // Ticket ID input field
-        TextField ticketIdField = new TextField();
-        ticketIdField.setPromptText("Enter Ticket ID to Cancel");
-        ticketIdField.setStyle("-fx-border-color: #2196F3; -fx-background-color: #f0f8ff; -fx-padding: 8px; -fx-font-size: 14px;");
-
-        // Cancel button with hover effect
-        Button cancelButton = new Button("Cancel Ticket");
-        cancelButton.setStyle("-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;");
-        cancelButton.setOnMouseEntered(e -> cancelButton.setStyle("-fx-background-color: #FF7043; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;"));
-        cancelButton.setOnMouseExited(e -> cancelButton.setStyle("-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;"));
-
-        // Status label for cancel status
-        Label cancelStatus = new Label();
-        cancelStatus.setStyle("-fx-font-size: 14px; -fx-text-fill: green;");
-
-        // Action for the cancel button
-        cancelButton.setOnAction(e -> {
-            try {
-                int ticketId = Integer.parseInt(ticketIdField.getText().trim());
-                int vendorId = Integer.parseInt(vendorIdField.getText().trim()); // Get vendor ID input
-
-                // Process the cancellation
-                Ticket canceledTicket = cancelTicket(ticketId);
-                if (canceledTicket != null) {
-                    cancelStatus.setText("Ticket " + ticketId + " canceled successfully by Vendor ID: " + vendorId);
-                    Logger.logEvent("Vendor ID: " + vendorId + " canceled Ticket " + ticketId);
-                } else {
-                    cancelStatus.setText("Ticket " + ticketId + " not found or already canceled.");
-                }
-            } catch (NumberFormatException ex) {
-                cancelStatus.setText("Invalid input. Please enter valid numbers for Ticket ID and Vendor ID.");
-            }
-        });
-
-        // Add all elements to the cancelLayout
-        cancelLayout.getChildren().addAll(titleLabel, vendorIdField, ticketIdField, cancelButton, cancelStatus);
-
-        // Create a scene for the cancel window and show it
-        Scene cancelScene = new Scene(cancelLayout, 400, 250);
-        cancelStage.setScene(cancelScene);
-        cancelStage.show();
-    }
-
-    private Ticket cancelTicket(int ticketId) {
-        // For demo purposes, assume ticket ID 1 is valid and others are not
-        if (ticketId == 1) {
-            return new Ticket(ticketId, "Sample Event", 100.0);
-        }
-        return null;
     }
 
     private void startSystem(int totalTickets, int releaseRate, int retrievalRate) {
