@@ -7,6 +7,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.scene.text.Font;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,58 +29,67 @@ public class UserInterface extends Application {
         // Input fields
         TextField totalTicketsField = new TextField();
         totalTicketsField.setPromptText("Total Tickets");
-        totalTicketsField.setStyle("-fx-padding: 10; -fx-font-size: 14px;");
+        totalTicketsField.setStyle("-fx-padding: 12; -fx-font-size: 14px; -fx-border-radius: 15px; -fx-background-color: #e0f7fa; -fx-border-color: #26c6da;");
 
         TextField maxCapacityField = new TextField();
         maxCapacityField.setPromptText("Max Capacity");
-        maxCapacityField.setStyle("-fx-padding: 10; -fx-font-size: 14px;");
+        maxCapacityField.setStyle("-fx-padding: 12; -fx-font-size: 14px; -fx-border-radius: 15px; -fx-background-color: #e0f7fa; -fx-border-color: #26c6da;");
 
         TextField releaseRateField = new TextField();
         releaseRateField.setPromptText("Release Rate (ms)");
-        releaseRateField.setStyle("-fx-padding: 10; -fx-font-size: 14px;");
+        releaseRateField.setStyle("-fx-padding: 12; -fx-font-size: 14px; -fx-border-radius: 15px; -fx-background-color: #e0f7fa; -fx-border-color: #26c6da;");
 
         TextField retrievalRateField = new TextField();
         retrievalRateField.setPromptText("Retrieval Rate (ms)");
-        retrievalRateField.setStyle("-fx-padding: 10; -fx-font-size: 14px;");
+        retrievalRateField.setStyle("-fx-padding: 12; -fx-font-size: 14px; -fx-border-radius: 15px; -fx-background-color: #e0f7fa; -fx-border-color: #26c6da;");
 
         // Buttons
         Label statusLabel = new Label("System Status: Waiting for Input");
-        statusLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: blue;");
+        statusLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #00695c; -fx-font-weight: bold;");
 
         Button submitButton = new Button("Submit Parameters");
-        submitButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+        submitButton.setStyle("-fx-background-color: #00796b; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
+        submitButton.setOnMouseEntered(e -> submitButton.setStyle("-fx-background-color: #004d40; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;"));
+        submitButton.setOnMouseExited(e -> submitButton.setStyle("-fx-background-color: #00796b; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;"));
 
         Button startButton = new Button("Start System");
-        startButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
+        startButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
         startButton.setDisable(true);
 
         Button stopButton = new Button("Stop System");
-        stopButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
+        stopButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
         stopButton.setDisable(true);
 
         Button viewCustomersButton = new Button("View Customers");
-        viewCustomersButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
+        viewCustomersButton.setStyle("-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
 
         Button viewVendorsButton = new Button("View Vendors");
-        viewVendorsButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
-
-        Button loginButton = new Button("Login");
-        loginButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
-
-        Button signUpButton = new Button("Sign Up");
-        signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
+        viewVendorsButton.setStyle("-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
 
         Button cancelTicketButton = new Button("Cancel Ticket");
-        cancelTicketButton.setStyle("-fx-background-color: #FFC107; -fx-text-fill: black; -fx-font-size: 14px;");
+        cancelTicketButton.setStyle("-fx-background-color: #ffc107; -fx-text-fill: black; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
 
-        // Layout
-        VBox layout = new VBox(15);
+        // Buttons for login and signup in the top-right corner
+        Button loginButton = new Button("Login");
+        loginButton.setStyle("-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
+
+        Button signUpButton = new Button("Sign Up");
+        signUpButton.setStyle("-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 12px;");
+
+        // Layout for top-right buttons
+        HBox topRightLayout = new HBox(10);
+        topRightLayout.setAlignment(Pos.TOP_RIGHT);
+        topRightLayout.setStyle("-fx-padding: 20;");
+        topRightLayout.getChildren().addAll(loginButton, signUpButton);
+
+        VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #f4f4f9; -fx-padding: 20;");
+        layout.setStyle("-fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 10px;");
         layout.getChildren().addAll(
+                topRightLayout, // Add the top-right layout with buttons
                 totalTicketsField, maxCapacityField, releaseRateField, retrievalRateField,
                 submitButton, statusLabel, startButton, stopButton,
-                viewCustomersButton, viewVendorsButton, loginButton, signUpButton, cancelTicketButton
+                viewCustomersButton, viewVendorsButton, cancelTicketButton
         );
 
         Scene scene = new Scene(layout, 500, 600);
@@ -176,10 +186,10 @@ public class UserInterface extends Application {
         ticketIdField.setStyle("-fx-padding: 8px; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
         Button cancelButton = new Button("Cancel Ticket");
-        cancelButton.setStyle("-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14px;");
+        cancelButton.setStyle("-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px;");
 
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
+        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px;");
 
         Label statusLabel = new Label();
         statusLabel.setStyle("-fx-font-size: 14px;");
@@ -231,9 +241,9 @@ public class UserInterface extends Application {
         roleChoiceBox.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3;");
 
         Button loginButton = new Button("Login");
-        loginButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
+        loginButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px;");
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
+        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px;");
 
         Label statusLabel = new Label();
         statusLabel.setStyle("-fx-font-size: 14px;");
@@ -285,9 +295,9 @@ public class UserInterface extends Application {
         passwordField.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
         Button signUpButton = new Button("Sign Up");
-        signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;");
+        signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px;");
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
+        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px;");
 
         Label statusLabel = new Label();
         statusLabel.setStyle("-fx-font-size: 14px;");
