@@ -1,18 +1,19 @@
 package org.example;
 
+import java.util.List;
+
 public class Vendor implements Runnable {
     private final TicketPool ticketPool;
     private final String vendorId;
     private final int ticketsPerRelease;
     private volatile boolean running = true;
-    private final UserInterface userInterface;  // Reference to the UserInterface
+    private final UserInterface userInterface; // Reference to UserInterface
 
-    // Updated Constructor to accept UserInterface
     public Vendor(TicketPool ticketPool, String vendorId, int ticketsPerRelease, UserInterface userInterface) {
         this.ticketPool = ticketPool;
         this.vendorId = vendorId;
         this.ticketsPerRelease = ticketsPerRelease;
-        this.userInterface = userInterface;
+        this.userInterface = userInterface; // Assign reference
     }
 
     public void stop() {
@@ -26,10 +27,11 @@ public class Vendor implements Runnable {
             while (running) {
                 for (int i = 0; i < ticketsPerRelease; i++) {
                     if (!running) break;
+
                     Ticket ticket = new Ticket(ticketId++, "Event Simple", 1000.0);
                     ticketPool.addTicket(ticket);
 
-                    // Update vendor details in the UserInterface
+                    // Add ticket information to vendorDetails
                     synchronized (userInterface.getVendorDetails()) {
                         userInterface.getVendorDetails().add("Vendor ID: " + vendorId + " - Released Ticket: " + ticket);
                     }
@@ -40,7 +42,7 @@ public class Vendor implements Runnable {
             }
         } catch (InterruptedException e) {
             System.out.println("Vendor " + vendorId + " interrupted.");
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt(); // Re-interrupt the thread
         }
     }
 }

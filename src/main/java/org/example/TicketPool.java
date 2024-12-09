@@ -49,4 +49,10 @@ public class TicketPool {
     public synchronized int getTicketCount() {
         return tickets.size();
     }
+
+    // Method to re-add a canceled ticket to the pool
+    public synchronized void cancelTicket(Ticket ticket) {
+        tickets.add(ticket);
+        notifyAll(); // Notify consumers that a ticket is available again
+    }
 }
