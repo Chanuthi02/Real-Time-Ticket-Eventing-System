@@ -5,10 +5,16 @@ public class Ticket {
     private final String eventName;
     private final double ticketPrice;
 
+    // Constructor
     public Ticket(int ticketId, String eventName, double ticketPrice) {
         this.ticketId = ticketId;
         this.eventName = eventName;
         this.ticketPrice = ticketPrice;
+    }
+
+    // Getter for ticketId
+    public int getTicketId() {
+        return ticketId;
     }
 
     @Override
