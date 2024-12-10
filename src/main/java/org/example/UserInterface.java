@@ -321,10 +321,22 @@ public class UserInterface extends Application {
             String password = passwordField.getText().trim();
             String role = roleChoiceBox.getValue();
 
+            // Check if the role is present and not null
+            String storedRole = userRoles.get(username);
             if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)
                     && userRoles.get(username).equals(role)) {
                 statusLabel.setText("Login successful as " + role + "!");
                 statusLabel.setStyle("-fx-text-fill: green;");
+
+                // Redirect based on role
+                if (role.equals("Admin")) {
+                    openAdminPage();
+                } else if (role.equals("Vendor")) {
+                    openVendorPage();
+                } else {
+                    openCustomerPage();
+                }
+
             } else {
                 statusLabel.setText("Invalid credentials or role!");
                 statusLabel.setStyle("-fx-text-fill: red;");
