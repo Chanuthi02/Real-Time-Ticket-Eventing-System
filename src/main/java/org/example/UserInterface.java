@@ -121,6 +121,8 @@ public class UserInterface extends Application {
 
                 startButton.setDisable(false);
                 statusLabel.setText("Parameters Submitted. Ready to Start.");
+
+
             } catch (NumberFormatException ex) {
                 statusLabel.setText("Invalid input. Please enter numeric values.");
             } catch (IllegalArgumentException ex) {
@@ -162,6 +164,72 @@ public class UserInterface extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Event Ticketing System - GUI");
         primaryStage.show();
+    }
+
+    // Admin Page
+    private void openAdminPage() {
+        Stage adminStage = new Stage();
+        adminStage.setTitle("Admin Dashboard");
+
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-background-color: #f4f4f9; -fx-padding: 20;");
+
+        Label titleLabel = new Label("Admin Dashboard");
+        titleLabel.setFont(Font.font("Arial", 20));
+        layout.getChildren().add(titleLabel);
+
+        // Add admin functionality here
+        Button manageVendorsButton = new Button("Manage Vendors");
+        manageVendorsButton.setStyle("-fx-padding: 10px;");
+        layout.getChildren().add(manageVendorsButton);
+
+        adminStage.setScene(new Scene(layout, 400, 300));
+        adminStage.show();
+    }
+
+    // Vendor Page
+    private void openVendorPage() {
+        Stage vendorStage = new Stage();
+        vendorStage.setTitle("Vendor Dashboard");
+
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-background-color: #f4f4f9; -fx-padding: 20;");
+
+        Label titleLabel = new Label("Vendor Dashboard");
+        titleLabel.setFont(Font.font("Arial", 20));
+        layout.getChildren().add(titleLabel);
+
+        // Add vendor functionality here
+        Button releaseTicketsButton = new Button("Release Tickets");
+        releaseTicketsButton.setStyle("-fx-padding: 10px;");
+        layout.getChildren().add(releaseTicketsButton);
+
+        vendorStage.setScene(new Scene(layout, 400, 300));
+        vendorStage.show();
+    }
+
+    // Customer Page
+    private void openCustomerPage() {
+        Stage customerStage = new Stage();
+        customerStage.setTitle("Customer Dashboard");
+
+        VBox layout = new VBox(10);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-background-color: #f4f4f9; -fx-padding: 20;");
+
+        Label titleLabel = new Label("Customer Dashboard");
+        titleLabel.setFont(Font.font("Arial", 20));
+        layout.getChildren().add(titleLabel);
+
+        // Add customer functionality here
+        Button viewTicketsButton = new Button("View Purchased Tickets");
+        viewTicketsButton.setStyle("-fx-padding: 10px;");
+        layout.getChildren().add(viewTicketsButton);
+
+        customerStage.setScene(new Scene(layout, 400, 300));
+        customerStage.show();
     }
 
     // Cancel Ticket Window with Vendor Details
