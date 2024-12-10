@@ -321,27 +321,47 @@ public class UserInterface extends Application {
             String password = passwordField.getText().trim();
             String role = roleChoiceBox.getValue();
 
-            // Check if the role is present and not null
-            String storedRole = userRoles.get(username);
-            if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)
-                    && userRoles.get(username).equals(role)) {
-                statusLabel.setText("Login successful as " + role + "!");
-                statusLabel.setStyle("-fx-text-fill: green;");
+            // Check if the username exists in the userCredentials map
+            if (userCredentials.containsKey(username)) {
+                // Get the stored password and role
+                String storedPassword = userCredentials.get(username);
+                String storedRole = userRoles.get(username);
 
-                // Redirect based on role
-                if (role.equals("Admin")) {
-                    openAdminPage();
-                } else if (role.equals("Vendor")) {
-                    openVendorPage();
+                // Debugging: Print the stored role and selected role to check the values
+                System.out.println("Stored Role: " + storedRole);
+                System.out.println("Selected Role: " + role);
+
+                // Validate the password and role
+                if (storedPassword != null && storedPassword.equals(password)) {
+                    if (storedRole != null && storedRole.equals(role)) {
+                        statusLabel.setText("Login successful as " + role + "!");
+                        statusLabel.setStyle("-fx-text-fill: green;");
+
+                        // Redirect based on role
+                        if (role.equals("Admin")) {
+                            openAdminPage();
+                        } else if (role.equals("Vendor")) {
+                            openVendorPage();
+                        } else {
+                            openCustomerPage();
+                        }
+
+                        // Close the login window or perform further actions as needed
+                        loginStage.close();
+                    } else {
+                        statusLabel.setText("Role mismatch!");
+                        statusLabel.setStyle("-fx-text-fill: red;");
+                    }
                 } else {
-                    openCustomerPage();
+                    statusLabel.setText("Invalid password!");
+                    statusLabel.setStyle("-fx-text-fill: red;");
                 }
-
             } else {
-                statusLabel.setText("Invalid credentials or role!");
+                statusLabel.setText("Username not found!");
                 statusLabel.setStyle("-fx-text-fill: red;");
             }
         });
+
 
         backButton.setOnAction(e -> loginStage.close());
 
@@ -374,6 +394,12 @@ public class UserInterface extends Application {
         passwordField.setPromptText("Password");
         passwordField.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3; -fx-background-color: #f0f8ff;");
 
+        // Role ChoiceBox (Admin, Vendor, Customer)
+        ChoiceBox<String> roleChoiceBox = new ChoiceBox<>();
+        roleChoiceBox.getItems().addAll("Admin", "Vendor", "Customer");
+        roleChoiceBox.setValue("Customer"); // Default role
+        roleChoiceBox.setStyle("-fx-padding: 10; -fx-font-size: 14px; -fx-border-color: #2196F3;");
+
         Button signUpButton = new Button("Sign Up");
         signUpButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-border-radius: 5px;");
         Button backButton = new Button("Back");
@@ -386,6 +412,7 @@ public class UserInterface extends Application {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
             String password = passwordField.getText().trim();
+            String role = roleChoiceBox.getValue(); // Get selected role
 
             if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 statusLabel.setText("All fields are required!");
@@ -398,6 +425,7 @@ public class UserInterface extends Application {
                 statusLabel.setStyle("-fx-text-fill: red;");
             } else {
                 userCredentials.put(username, password);
+                userRoles.put(username, role);  // Save role for login
                 statusLabel.setText("Sign-up successful!");
                 statusLabel.setStyle("-fx-text-fill: green;");
             }
@@ -405,7 +433,7 @@ public class UserInterface extends Application {
 
         backButton.setOnAction(e -> signUpStage.close());
 
-        layout.getChildren().addAll(titleLabel, usernameField, emailField, passwordField, signUpButton, backButton, statusLabel);
+        layout.getChildren().addAll(titleLabel, usernameField, emailField, passwordField, roleChoiceBox, signUpButton, backButton, statusLabel);
         signUpStage.setScene(new Scene(layout, 300, 350));
         signUpStage.show();
     }
